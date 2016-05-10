@@ -1,0 +1,3 @@
+WARNING: The invoice number has not the proper amount of digits on row: 1. An attempt will be made to correct this. 
+ERROR:   Attempt to correct invoice number has failed. 
+ERROR:   You made an error in writing down the amounts on row: 1. 

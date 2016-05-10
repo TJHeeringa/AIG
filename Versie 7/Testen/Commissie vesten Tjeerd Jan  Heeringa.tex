@@ -1,0 +1,74 @@
+\documentclass[a4paper,11pt,streepjes]{brief}
+\usepackage[dutch]{babel}
+\hyphenation{Abacus}
+\usepackage{graphicx}
+\usepackage{eurosym}
+\newcommand{\eur}[1]{\geneuro\,\ensuremath{#1}}
+\renewcommand{\euro}{\geneuro}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{palatino} % lettertype
+%\usepackage{mathpazo}
+\definecolor{light-gray}{gray}{0.85}
+\usepackage{hyperref}
+\hypersetup{
+pdftitle={},
+pdfauthor={Tjeerd Jan Heeringa/Jan-Tino Brethouder},
+pdfsubject={},
+pdfkeywords={},
+colorlinks={true},
+linkcolor={black},
+urlcolor={black}
+}
+\frenchspacing
+\renewcommand{\uwbrieftekst}{Betalingskenmerk}
+\makeatletter
+\renewcommand*\voetitem[2]{%
+	\advance\@voetteller by 1
+	\setbox\@voetruimte\hb@xt@\refveldbreedte{%
+	\unhbox\@voetruimte
+	\ifcase\@voetteller \relax \or \relax \or \hfil \else \hfill
+	\fi
+	\@refveld{#1}{#2}\hskip20\p@ \@plus 3\refveldbreedte}}
+\let\footitem\voetitem
+\setbox\@voetruimte=\hbox{}
+\makeatother
+\newcommand{\factuurnummer}{3.00006E+15}
+\newcommand{\betreftregel}{Commissie vesten}
+\newcommand{\zaak}{het aanschaffen en laten bedrukken van vesten voor de commissie}
+\newcommand{\voornaam}{Tjeerd Jan}
+\newcommand{\adres}{T.J. Heeringa\\Wethouder Nijhuisstraat 200\\7545NN Enschede}
+
+\begin{document}
+\begin{brief}{\adres}
+\maakbriefhoofd*{Wiskundig Studiegenootschap Abacus}{W.S.G. Abacus\\
+Zilverling E203\\
+Postbus 217\\
+7500 AE\ \ Enschede}
+\uwbriefvan{\factuurnummer}
+%\uwkenmerk{}
+\onskenmerk{F.\factuurnummer}
+\betreft{\betreftregel}
+\opening{Beste \voornaam,}
+Bij dezen stuur ik u de factuur voor \zaak.
+\vskip 5pt
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}%
+\begin{tabularx}{\textwidth}{p{.75\textwidth}|lR}
+\cellcolor{light-gray}\centering Omschrijving & \multicolumn{2}{c}{\cellcolor{light-gray}Bedrag}\\\hline
+Commissie vest & \euro & 7.00 \\[6pt]\hline 
+{\bf Totaal} & \euro & 7.00
+\end{tabularx}
+\vskip 5pt
+U wordt verzocht het gespecificeerde bedrag binnen een termijn van 30 dagen over te maken naar het hieronder vermelde rekeningnummer ten name van W.S.G. Abacus onder vermelding van het betalingskenmerk.
+
+Voor meer informatie kunt u contact opnemen met ondergetekende.
+
+\afsluiting{Met vriendelijke groet,}
+\ondertekening{Tjeerd Jan Heeringa\\Penningmeester~W.S.G.~Abacus}
+%{\vskip 25pt\bf Let op, ons rekeningnummer is gew"yzigd.}
+\voetitem{IBAN:}{NL29 RABO 0120471108}
+\voetitem{KvK-nr:}{40074362}
+\voetitem{e-mail:}{penningmeester@abacus.utwente.nl}
+\end{brief}
+\end{document}
+
