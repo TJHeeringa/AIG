@@ -221,7 +221,7 @@ class Application(Frame):
                                 print "ERROR:   You made an error in writing down the amount on row: "+str(rowCount)+"."
                                 logFile.write("ERROR:   You made an error in writing down the amount on row: "+str(rowCount)+". \n")
                         if self.CheckVar2.get() == 1:
-                            newFileContent = newFileContent.replace("PaymentPeriod}{14","PaymentPeriod}{"+self.EntryVar2.get())
+                            newFileContent = newFileContent.replace("paymentperiod}{14","paymentperiod}{"+self.EntryVar2.get())
                         totaalbedrag = self.numberCheckOn2Decimal(totaalbedrag,rowCount)
                         newFileContent = newFileContent.replace("totaalbedrag",str(totaalbedrag))
 
