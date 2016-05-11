@@ -90,7 +90,7 @@ class Application(Frame):
                             initialenIndex = row.index("Initialen")
                             adresIndex = row.index("Adres")
                             postcodeIndex = row.index("Postcode")
-                            plaatsIndex = row.index("Stad")
+                            plaatsIndex = row.index("Plaats")
                         except:
                             print "FATAL ERROR: There is an error in the names for the columns for the userdata."
                             sys.exit("FATAL ERROR: There is an error in the names for the columns for the userdata.")
@@ -176,7 +176,7 @@ class Application(Frame):
                         newFileContent = newFileContent.replace("zaak}{zaak","zaak}{"+zaak)
                         if postIndexPresent == True:
                             try:
-                                post = row[postIndex].split(",")
+                                post = row[postIndex].split(self.blockDelimiterString)
                                 if len(bedrag)!=len(post):
                                     print "WARNING: The number of entries and amounts are unequal on row: "+str(rowCount)+"."
                                     logFile.write("WARNING: The number of entries and amounts are unequal on row: "+str(rowCount)+". \n")
@@ -298,7 +298,7 @@ class Application(Frame):
         General config
         '''
         self.delimiterString = ";"
-#        self.blockDelimiterString = ";"
+        self.blockDelimiterString = ","
         self.totaalbedrag = 0
         self.bedragLine = ""
         self.rowCount = 0
