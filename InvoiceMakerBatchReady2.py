@@ -8,6 +8,14 @@ from Tkinter import *
 from tkFileDialog import askopenfilename
 from tkFileDialog import askdirectory
 
+######
+# DUMP the sys.exits
+# add the paymentPeriod
+# add help
+# 
+#
+######
+
 '''
 Setup GUI
 '''
