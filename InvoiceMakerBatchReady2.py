@@ -83,6 +83,7 @@ class Application(Frame):
                     In the first round the loop will gather the location of the keywords in the csvfile.
                     '''        
                     if rowCount == 0:
+                        # add something for the payment period
                         try:
                             voornaamIndex = row.index("Voornaam")
                             tussenvoegselIndex =  row.index("Tussenvoegsel")
@@ -152,6 +153,7 @@ class Application(Frame):
                         onderwerp = row[onderwerpIndex]
                         zaak = row[zaakIndex]
                         bedrag = row[bedragIndex].split(",")
+                        # add something for the Payment period
                         logFile.write("hoi")
                         newFileContent = templateContent.replace("adres}{adres","adres}{"+initialen+" "+achternaam+r'\\'+adres+r'\\'+postcode+" "+plaats)
                         try:
@@ -218,6 +220,7 @@ class Application(Frame):
                         '''
                         Create temporary .tex file to store the edited template The temporary file will be made to an .pdf and can be deleted afterwards.
                         '''
+                        # change this to something more general and usefull as this doenst really work with Mailmerge
                         if tussenvoegsel == "":
                             newFile = open(self.destinationFolder+"/"+onderwerp+" "+voornaam+" "+achternaam+".tex","a+")
                             newFile.write(newFileContent)
