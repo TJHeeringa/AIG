@@ -1,12 +1,1 @@
-Voornaam;Tussenvoegsel;Titel;Initialen;Achternaam;Adres;Postcode;Plaats;E-mailadres;Factuurnummer;Post;Zaak;Onderwerp;Bedrag;PO-nummer;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;
+Titel;Voornaam;Initialen;Tussenvoegsel;Achternaam;Adres;Postcode;Plaats;E-mailadres;Onderwerp;Factuurnummer;PO-nummer;Zaak;Post;Bedrag;Betalingstermijn

@@ -12,15 +12,14 @@ from tkFileDialog import askdirectory
 # DUMP the sys.exits
 # add the paymentPeriod
 # add help
-# 
 #
 ######
 
-'''
-Setup GUI
-'''
-class Application(Frame):
 
+# ###
+# Setup GUI
+# ###
+class Application(Frame):
     def create_pdf(self,input_filename, output_filename):
         process = subprocess.Popen([
             'latex',   # Or maybe 'C:\\Program Files\\MikTex\\miktex\\bin\\latex.exe
@@ -29,7 +28,7 @@ class Application(Frame):
             input_filename])
         process.wait()
 
-    def numberCheckOn2Decimal(self,number,rowCount):
+    def numberCheckOn2Decimal(self, number, rowCount):
         try:
             number = "{0:.2f}".format(float(number))
         except:
@@ -38,7 +37,7 @@ class Application(Frame):
             return number
 
     def openCSV(self):
-        self.csvFile = askopenfilename(filetypes=[("CSV","*.csv")])
+        self.csvFile = askopenfilename(filetypes=[("CSV", "*.csv")])
         self.EntryText.set(str(self.csvFile))
         if (self.EntryText.get() != "" and self.EntryText2.get() != "" and self.EntryText3.get() != ""):
             self.button4.config(state='normal')
@@ -70,7 +69,7 @@ class Application(Frame):
             self.CheckVar2.set(0) 
 
     def generateInvoices(self):
-        logFile = open(self.destinationFolder+"/logFile.txt","w")
+        logFile = open(self.destinationFolder+"/logFile.txt", "w")
         if self.CheckVar8.get() == 1:
             try:
                 templateContent = open(os.path.dirname(sys.argv[0])+"\standaard_factuur.tex").read()
@@ -254,24 +253,24 @@ class Application(Frame):
         '''
         self.helpFrame = LabelFrame(root,width=350, text="HELP")
         self.helpFrame.grid(row=0,column=9, columnspan=2, rowspan=8, sticky='NSE', padx=5, pady=5, ipadx=5, ipady=5)
-        label = Label(self.helpFrame, text = self.helpText).grid(row=0, column =1,sticky="E")
+        label = Label(self.helpFrame, text = self.helpText).grid(row=0, column=1, sticky="E")
 
         '''
         Top-left label
         '''
-        self.labelFrame = LabelFrame(root,width=600,height=200, text="Enter File Details:")
+        self.labelFrame = LabelFrame(root, width=600,height=200, text="Enter File Details:")
         self.labelFrame.grid(row=0, column=0, sticky='WE', padx=5, pady=5, ipadx=5, ipady=5)
-        Label(self.labelFrame, text = self.labelText).grid(row=0, column =1,sticky="W")
-        Label(self.labelFrame, text = self.labelText2).grid(row=1, column =1,sticky="W")
-        Label(self.labelFrame, text = self.labelText3).grid(row=2, column =1,sticky="W")
-        Entry(self.labelFrame, text = self.EntryText,width=60).grid(row=0, column =9,columnspan=100, sticky="WE", pady=3)
+        Label(self.labelFrame, text=self.labelText).grid(row=0, column=1, sticky="W")
+        Label(self.labelFrame, text=self.labelText2).grid(row=1, column=1, sticky="W")
+        Label(self.labelFrame, text=self.labelText3).grid(row=2, column=1, sticky="W")
+        Entry(self.labelFrame, text=self.EntryText,width=60).grid(row=0, column=9, columnspan=100, sticky="WE", pady=3)
         self.EntryBox2 = Entry(self.labelFrame, text = self.EntryText2,state=DISABLED)
-        self.EntryBox2.grid(row=1, column =9,columnspan=100, sticky="WE", pady=3)
+        self.EntryBox2.grid(row=1, column=9, columnspan=100, sticky="WE", pady=3)
         Entry(self.labelFrame, text = self.EntryText3).grid(row=2, column =9,columnspan=100, sticky="WE", pady=3)
-        Button(self.labelFrame,text="Browse File",command=self.openCSV).grid(row=0, column =140,sticky='WE', padx=5, pady=2)
-        self.button2 = Button(self.labelFrame,text="Browse File",command=self.openTemplate,state=DISABLED)
-        self.button2.grid(row=1, column =140,sticky='WE', padx=5, pady=2)
-        Button(self.labelFrame,text="Browse Folder",command=self.openDestination).grid(row=2, column=140,sticky='WE', padx=5, pady=2)
+        Button(self.labelFrame, text="Browse File", command=self.openCSV).grid(row=0, column =140,sticky='WE', padx=5, pady=2)
+        self.button2 = Button(self.labelFrame, text="Browse File", command=self.openTemplate,state=DISABLED)
+        self.button2.grid(row=1, column=140, sticky='WE', padx=5, pady=2)
+        Button(self.labelFrame, text="Browse Folder", command=self.openDestination).grid(row=2, column=140,sticky='WE', padx=5, pady=2)
 
         '''
         Middle-left label
@@ -298,8 +297,8 @@ class Application(Frame):
         self.labelFrame3 = LabelFrame(root,width=600,height=50, text="Run:")
         self.labelFrame3.grid_propagate(False)
         self.labelFrame3.grid(row=2, column=0, sticky='W', padx=5, pady=5, ipadx=5, ipady=5)
-        self.button4 = Button(self.labelFrame3,text="Generate Invoices",command=self.generateInvoices,state=DISABLED)
-        self.button4.grid( padx=5, pady=5,row=30, rowspan =400,column=40,sticky="W")
+        self.button4 = Button(self.labelFrame3, text="Generate Invoices", command=self.generateInvoices, state=DISABLED)
+        self.button4.grid(padx=5, pady=5,row=30, rowspan=400, column=40, sticky="W")
 
     def __init__(self, master=None):
         Frame.__init__(self, master)
@@ -355,6 +354,6 @@ class Application(Frame):
         
 root = Tk()
 root.title("Automatic Invoice Generator")
-root.geometry(("925x370"))
+root.geometry("925x370")
 app = Application(master=root)
 app.mainloop()
