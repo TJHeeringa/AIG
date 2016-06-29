@@ -19,19 +19,19 @@ import tkMessageBox
 # ###
 class Application(Frame):
 
-    def create_pdf(self, input_filename, output_filename):
+    def create_pdf(self, input_filename, output_directory):
         process = subprocess.Popen([
-            'latex',   # Or maybe 'C:\\Program Files\\MikTex\\miktex\\bin\\latex.exe
-            '-output-format=pdf',
-            '-job-name=' + output_filename,
+            'pdflatex',   # Or maybe 'C:\\Program Files\\MikTex\\miktex\\bin\\latex.exe
+            '-interaction=nonstopmode',
+            '-output-directory='+output_directory,
             input_filename])
         process.wait()
 
-    def numberCheckOn2Decimal(self, number, rowCount):
+    def numberCheckOn2Decimal(self, number, rowCount, logFile):
         try:
             number = "{0:.2f}".format(float(number))
         except:
-            print "There is something wrong with the numbers on row: " + str(rowCount) + "."
+            logFile.write("There is something wrong with the numbers on row: " + str(rowCount) + ".")
         finally:
             return number
 
@@ -70,6 +70,7 @@ class Application(Frame):
     def getAdresContent(self, userData):
         titel = userData["titel"]
         initialen = userData["initialen"]
+        tussenvoegsel = userData["tussenvoegsel"]
         achternaam = userData["achternaam"]
         bedrijsnaam = userData["bedrijfsnaam"]
         adres = userData["adres"]
@@ -80,29 +81,45 @@ class Application(Frame):
             adresContent = bedrijsnaam + r'\\' + "t.a.v. "
             if initialen != "" and achternaam != "":
                 if titel != "":
-                    adresContent += titel + " " + initialen + " " + achternaam
+                    if tussenvoegsel != "":
+                        adresContent += titel + " " + initialen + " " + tussenvoegsel + " " + achternaam
+                    else:
+                        adresContent += titel + " " + initialen + " " + achternaam
                 else:
-                    adresContent += initialen + " " + achternaam
+                    if tussenvoegsel != "":
+                        adresContent += initialen + " " + tussenvoegsel + " " + achternaam
+                    else:
+                        adresContent += initialen + " " + achternaam
             else:
                 adresContent += "de crediteurenadministratie"
         else:
             if titel != "":
-                adresContent = titel + " " + initialen + " " + achternaam
+                if tussenvoegsel != "":
+                    adresContent = titel + " " + initialen + " " + tussenvoegsel + " " + achternaam
+                else:
+                    adresContent = titel + " " + initialen + " " + achternaam
             else:
-                adresContent = initialen + " " + achternaam
+                if tussenvoegsel != "":
+                    adresContent = initialen + " " + tussenvoegsel + " " + achternaam
+                else:
+                    adresContent = initialen + " " + achternaam
         adresContent += r'\\' + adres + r'\\' + postcode + " " + plaats
         return adresContent
 
-    def getAanhefContent(userData):
+    def getAanhefContent(self, userData):
         titel = userData["titel"]
         initialen = userData["initialen"]
         voornaam = userData["voornaam"]
+        tussenvoegsel = userData["tussenvoegsel"]
         achternaam = userData["achternaam"]
         if voornaam != "":
             aanhefContent = voornaam
         else:
             if titel != "":
-                aanhefContent = titel + " " + initialen + " " + achternaam
+                if tussenvoegsel != "":
+                    aanhefContent = titel + " " + initialen + " " + tussenvoegsel + " " + achternaam
+                else:
+                    aanhefContent = titel + " " + initialen + " " + achternaam
             else:
                 if achternaam == "":
                     aanhefContent = "heer, mevrouw"
@@ -114,6 +131,8 @@ class Application(Frame):
         else:
             if betalingstermijn != "":
                 betalingstermijnContent = betalingstermijn
+            else:
+                betalingstermijnContent = self.EntryVar2.get()
         return betalingstermijnContent
 
     def getFactuurnummerContent(self, factuurnummer, rowCount, logFile):
@@ -125,22 +144,17 @@ class Application(Frame):
                 This part will check and correct the length of the number
                 """
                 if len(factuurnummer) + 1 != int(self.EntryVar.get()):
-                    print "WARNING: The invoice number has not the proper amount of digits on row: " + str(
-                        rowCount) + ". An attempt will be made to correct this."
                     logFile.write("WARNING: The invoice number has not the proper amount of digits on row: " + str(
                         rowCount) + ". An attempt will be made to correct this. \n")
                     try:
                         numberFormat = "{0:0" + self.EntryVar.get() + "d}"
                         factuurnummer = numberFormat.format(int(factuurnummer))
-                        print "NOTICE:  The invoice number on row " + str(rowCount) + " has been corrected."
                         logFile.write(
                             "NOTICE:  The invoice number on row " + str(rowCount) + " has been corrected. \n")
                     except:
-                        print "ERROR:   Attempt to correct invoice number has failed."
                         logFile.write(
-                            "ERROR:   Attempt to correct invoice number has failed. \n")
+                            "ERROR:   Attempt to correct invoice number on row" + str(rowCount) + "has failed. \n")
             except:
-                print "WARNING: You made an error in writing down the invoice number on row: " + str(rowCount) + "."
                 logFile.write(
                     "WARNING: You made an error in writing down the invoice number on row: " + str(rowCount) + ".")
         return factuurnummer
@@ -151,53 +165,52 @@ class Application(Frame):
         if post != [""]:
             try:
                 if len(bedrag) != len(post):
-                    print "WARNING: The number of entries and amounts are unequal on row: " + str(rowCount) + "."
                     logFile.write(
                         "WARNING: The number of entries and amounts are unequal on row: " + str(rowCount) + ". \n")
                 for i in range(0, len(bedrag)):
                     if post[i] == '':
-                        print "WARNING: The " + str(i + 1) + "th entry is empty on row: " + str(
-                            rowCount) + ". Subject will be used as entry."
                         logFile.write("WARNING: The " + str(i + 1) + "th entry is empty on row: " + str(
                             rowCount) + ". Subject will be used as entry. \n")
                         post[i] = onderwerp
                     bedragLine += post[i] + r" & \euro & " + self.numberCheckOn2Decimal(
-                        bedrag[i], rowCount) + r" \\[6pt]\hline "
+                        bedrag[i], rowCount, logFile) + r" \\[6pt]\hline "
                     totaalbedrag += float(bedrag[i])
             except:
                 try:
                     for i in range(0, len(bedrag)):
                         bedragLine += r"\betreftregel & \euro & " + self.numberCheckOn2Decimal(
-                            bedrag[i], rowCount) + r" \\[6pt]\hline"
+                            bedrag[i], rowCount, logFile) + r" \\[6pt]\hline"
                         totaalbedrag += float(bedrag[i])
-                    print "ERROR:   You made an error in writing down the entries on row: " + str(rowCount) + "."
                     logFile.write(
                         "ERROR:   You made an error in writing down the entries on row: " + str(rowCount) + ". \n")
                 except:
-                    print "ERROR:   You made an error in writing down the amounts on row: " + str(rowCount) + "."
                     logFile.write(
                         "ERROR:   You made an error in writing down the amounts on row: " + str(rowCount) + ". \n")
         else:
             try:
                 bedragLine += r"\betreftregel & \euro & " + \
                               self.numberCheckOn2Decimal(
-                                  bedrag[0], rowCount) + r" \\[6pt]\hline"
+                                  bedrag[0], rowCount, logFile) + r" \\[6pt]\hline"
                 totaalbedrag += float(bedrag[0])
                 if len(bedrag) != 1:
-                    print "WARNING: You wrote multiple amounts eventhough there are no different entries on row: " + str(
-                        rowCount) + ". Only the first number will be used."
                     logFile.write(
                         "WARNING: You wrote multiple amounts eventhough there are no different entries on row: " + str(
                             rowCount) + ". Only the first number will be used. \n")
             except:
-                print "ERROR:   You made an error in writing down the amount on row: " + str(rowCount) + "."
                 logFile.write(
                     "ERROR:   You made an error in writing down the amount on row: " + str(rowCount) + ". \n")
         tabelContent = {
             "bedragLine": bedragLine,
-            "totaalbedrag": str(totaalbedrag)
+            "totaalbedrag": str(self.numberCheckOn2Decimal(totaalbedrag, rowCount, logFile))
         }
         return tabelContent
+
+    def getPonummerContent(self, ponummer):
+        if ponummer != "":
+            ponummerContent = "\uwkenmerk{" + ponummer + "}"
+        else:
+            ponummerContent = "%\uwkenmerk{}"
+        return ponummerContent
 
     def generateInvoices(self):
         """
@@ -216,8 +229,7 @@ class Application(Frame):
                     templateContent = open(os.path.dirname(
                         sys.argv[0]) + "\default_invoice.tex").read()
                 except:
-                    print "FATAL ERROR: No default invoice present in the application folder."
-                    sys.exit(
+                    tkMessageBox.showerror("Fatal Error",
                         "FATAL ERROR: No default invoice present in the application folder.")
         else:
             templateContent = open(self.template).read()
@@ -225,15 +237,15 @@ class Application(Frame):
         Look if the code should do anything
         """
         if self.CheckVar3.get() == 0:
-            rowCount = 0
+            rowCount = 1
             with open(self.csvFile, 'rb') as csvfile:
                 spamreader = csv.reader(
-                    csvfile, delimiter=self.delimiterString, quotechar='|')
+                    csvfile, delimiter=self.delimiterString)
                 for row in spamreader:
                     """
                     In the first round the loop will gather the location of the keywords in the csvfile.
                     """
-                    if rowCount == 0:
+                    if rowCount == 1:
                         try:
                             titelIndex = row.index("Titel")
                             voornaamIndex = row.index("Voornaam")
@@ -252,6 +264,11 @@ class Application(Frame):
                         except:
                             tkMessageBox.showerror("Fatal Error",
                                 "FATAL ERROR: You forgot to add the column with invoice numbers called: Betalingstermijn.")
+                        try:
+                            ponummerIndex = row.index("PO-nummer")
+                        except:
+                            tkMessageBox.showerror("Fatal Error",
+                                "FATAL ERROR: You forgot to add the column with invoice numbers called: PO-nummer.")
                         try:
                             factuurnummerIndex = row.index("Factuurnummer")
                         except:
@@ -276,7 +293,7 @@ class Application(Frame):
                             postIndex = row.index("Post")
                         except:
                             tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR:  FATAL ERROR: You forgot to add the column with the entries for the bills: Post. \n")
+                                "FATAL ERROR: You forgot to add the column with the entries for the bills: Post.")
                         rowCount += 1
                         """
                         For each row with data this part will get the data from the proper columns and place them in the correct part of the selected template.
@@ -286,26 +303,25 @@ class Application(Frame):
                         Retrieve the data from the .csv
                         """
                         try:
-                            titel = row[titelIndex]
-                            voornaam = row[voornaamIndex]
-                            initialen = row[initialenIndex]
-                            tussenvoegsel = row[tussenvoegselIndex]
-                            achternaam = row[achternaamIndex]
-                            bedrijfsnaam = row[bedrijfsnaamIndex]
-                            adres = row[adresIndex]
-                            postcode = row[postcodeIndex]
-                            plaats = row[plaatsIndex]
+                            titel = row[titelIndex].strip()
+                            voornaam = row[voornaamIndex].strip()
+                            initialen = row[initialenIndex].strip()
+                            tussenvoegsel = row[tussenvoegselIndex].strip()
+                            achternaam = row[achternaamIndex].strip()
+                            bedrijfsnaam = row[bedrijfsnaamIndex].strip()
+                            adres = row[adresIndex].strip()
+                            postcode = row[postcodeIndex].strip()
+                            plaats = row[plaatsIndex].strip()
                         except:
-                            print "ERROR: There is something wrong with the userdata on row: " + str(rowCount) + "."
                             logFile.write(
                                 "ERROR: There is something wrong with the userdata on row: " + str(rowCount) + ". \n")
-                        factuurnummer = row[factuurnummerIndex]
-                        onderwerp = row[onderwerpIndex]
-                        zaak = row[zaakIndex]
+                        factuurnummer = row[factuurnummerIndex].strip()
+                        onderwerp = row[onderwerpIndex].strip()
+                        zaak = row[zaakIndex].strip()
                         bedrag = row[bedragIndex].split(self.blockDelimiterString)
                         post = row[postIndex].split(self.blockDelimiterString)
-                        betalingstermijn = row[betalingstermijnIndex]
-
+                        betalingstermijn = row[betalingstermijnIndex].strip()
+                        ponummer = row[ponummerIndex].strip()
                         """
                         Transform the gathered data to something that can be entered in the template
                         """
@@ -313,6 +329,7 @@ class Application(Frame):
                             "titel": titel,
                             "voornaam": voornaam,
                             "initialen": initialen,
+                            "tussenvoegsel":tussenvoegsel,
                             "achternaam": achternaam,
                             "bedrijfsnaam": bedrijfsnaam,
                             "adres": adres,
@@ -324,7 +341,7 @@ class Application(Frame):
                         betalingstermijnContent = self.getBetalingstermijnContent(betalingstermijn)
                         factuurnummerContent = self.getFactuurnummerContent(factuurnummer, rowCount, logFile)
                         tabelContent = self.getTabelContent(bedrag, post, onderwerp, rowCount, logFile)
-
+                        ponummerContent = self.getPonummerContent(ponummer)
                         """
                         Replace the content of the data in the invoice template
                         """
@@ -344,25 +361,31 @@ class Application(Frame):
                             r"\betreftregel & \euro & bedrag \\[6pt]\hline", tabelContent["bedragLine"])
                         newFileContent = newFileContent.replace(
                             "totaalbedrag", tabelContent["totaalbedrag"])
+                        newFileContent = newFileContent.replace(
+                            "%\uwkenmerk{}", ponummerContent)
 
                         """
                         Create temporary .tex file to store the edited template.
                         The temporary file will be made to an .pdf and can be deleted afterwards.
                         """
-                        newFile = open(self.destinationFolder + "/" + "F." + factuurnummer + " " + onderwerp + ".tex", "a+")
+                        newFile = open(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex", "a+")
                         newFile.write(newFileContent)
                         newFile.close()
-                        self.create_pdf(self.destinationFolder + "/" + "F." + factuurnummer + " " + onderwerp + ".tex",
-                                        self.destinationFolder + "/" + "F." + factuurnummer + " " + onderwerp)
+                        self.create_pdf(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex",
+                                        self.destinationFolder + "/")
                         if self.CheckVar6.get() == 0:
-                            os.remove(self.destinationFolder + "/" + onderwerp + " " +
-                                      voornaam + " " + tussenvoegsel + " " + achternaam + ".tex")
+                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex")
                         rowCount += 1
+                        if self.CheckVar7.get() == 1:
+                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".aux")
+                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".log")
+                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".out")
             logFile.close()
             if self.CheckVar2.get() == 1:
                 os.startfile(self.destinationFolder + "/logFile.txt")
             if self.CheckVar.get() == 0:
                 os.remove(self.destinationFolder + "/logFile.txt")
+            tkMessageBox.showinfo("AIG", "Invoices have been generated")
 
     def createWidgets(self):
         """
@@ -455,7 +478,7 @@ class Application(Frame):
         General config
         '''
         self.delimiterString = ";"
-        self.blockDelimiterString = ","
+        self.blockDelimiterString = "|"
         '''
         Static labels
         '''

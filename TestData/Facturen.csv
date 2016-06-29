@@ -1,0 +1,16 @@
+Voornaam;Tussenvoegsel;Titel;Initialen;Achternaam;Bedrijfsnaam;Adres;Postcode;Plaats;E-mailadres;Onderwerp;Factuurnummer;PO-nummer;Zaak;Post;Bedrag;Betalingstermijn
+VA;;;V;ABN;AMRO;Hier;EN;Daar;;Kaas;12345;1995;Makaroni;pizza| pannekoeken;2| 33;
+VA;VOOR;;V;ABN;AMRO;Hier;EN;Daar;;BBQ;12346;;Makaroni;pizza| pannekoeken;2| 33;
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Kaas;1234567890123;48620;koop van een kaas bij de makro  ;;48;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Tonijn;1;;koop van een kaas bij de makro  ;;;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Zalm;2;;koop van een kaas bij de makro  ;Goudse| 48+;2| 48;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Vis;3;;koop van een kaas bij de makro  ;Goudse| 48+;2;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Paling;4;;koop van een kaas bij de makro  ;Gou;2| 48;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Bezem;5;;;Goudse;48;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;;;;;BBQ;6;;koop van een kaas bij de makro  ;Goudse;48;5
+;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Ham;7;;koop van een kaas bij de makro  ;Goudse;48;5
+Tjeerd;;Msc;T.J.;Heeringa;Abacus;Hallenweg 19;7522 NH;Enschede;;Kaas;;;koop van een kaas bij de makro  ;Goudse;48;5
+Tjeerd;;Msc;;;Abacus;Hallenweg 19;7522 NH;Enschede;;Vlees;8;;koop van een kaas bij de makro  ;Goudse;48;5
+Tjeerd;;Msc;T.J.;;;Hallenweg 19;7522 NH;Enschede;;Groente;9;;koop van een kaas bij de makro  ;Goudse;48;5
+;;;;;;;;;;;44;;Blab;;48;
+Tjeerd;;Msc;T.J.;Heeringa;;Hallenweg 19;7522 NH;Enschede;;Spugg;12;;koop van een kaas bij de makro  ;Goudse;48;5
