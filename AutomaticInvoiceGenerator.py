@@ -31,7 +31,7 @@ class Application(Frame):
         try:
             number = "{0:.2f}".format(float(number))
         except:
-            logFile.write("There is something wrong with the numbers on row: " + str(rowCount) + ".")
+            logFile.write("ERROR:   There is something wrong with the numbers on row: " + str(rowCount) + ". \n")
         finally:
             return number
 
@@ -153,10 +153,10 @@ class Application(Frame):
                             "NOTICE:  The invoice number on row " + str(rowCount) + " has been corrected. \n")
                     except:
                         logFile.write(
-                            "ERROR:   Attempt to correct invoice number on row" + str(rowCount) + "has failed. \n")
+                            "ERROR:   Attempt to correct invoice number on row " + str(rowCount) + " has failed. \n")
             except:
                 logFile.write(
-                    "WARNING: You made an error in writing down the invoice number on row: " + str(rowCount) + ".")
+                    "ERROR:   You made an error in writing down the invoice number on row: " + str(rowCount) + ". \n")
         return factuurnummer
 
     def getTabelContent(self, bedrag, post, onderwerp, rowCount, logFile):
@@ -212,180 +212,215 @@ class Application(Frame):
             ponummerContent = "%\uwkenmerk{}"
         return ponummerContent
 
+    def generateEndForLogFile(self):
+        with open(self.destinationFolder + "/logFile.txt", "r") as logFile:
+            x = logFile.read()
+            if "WARNING:" in x and "ERROR:" in x:
+                endForLogFile = (
+                    "\n"
+                    "Finished with error(s) and warning(s) \n"
+                    "Please correct the .csv and try running again."
+                )
+            elif "WARNING:" in x:
+                    endForLogFile = (
+                    "\n"
+                    "Finished with warning(s) \n"
+                    "Autocorrection has been applied \n"
+                    "Please check whether autocorrection has gone properly \n"
+                    "In case of faulty autocorrection, please correct the .csv and try running again \n \n"
+                    "Generation succesful"
+                )
+            elif "ERROR:" in x:
+                endForLogFile = (
+                    "\n"
+                    "Finished with error(s) \n"
+                    "Please correct the .csv and try running again."
+                )
+            else:
+                endForLogFile = (
+                    "\n"
+                    "Finished without errors \n \n"
+                    "Generation succesful"
+                )
+        return endForLogFile
+
     def generateInvoices(self):
         """
-        Set log destination
+        Make log file and state that generation has started
         """
-        logFile = open(self.destinationFolder + "/logFile.txt", "w")
-        """
-        Set the template to use
-        """
-        if self.CheckVar8.get() == 1:
-            try:
-                templateContent = open(os.path.dirname(
-                    sys.argv[0]) + "\standaard_factuur.tex").read()
-            except:
+        with open(self.destinationFolder + "/logFile.txt", "w") as logFile:
+            logFile.write("Starting generation of invoices. \n \n")
+            """
+            Set the template to use
+            """
+            if self.CheckVar8.get() == 1:
                 try:
                     templateContent = open(os.path.dirname(
-                        sys.argv[0]) + "\default_invoice.tex").read()
+                        sys.argv[0]) + "\standaard_factuur.tex").read()
                 except:
-                    tkMessageBox.showerror("Fatal Error",
-                        "FATAL ERROR: No default invoice present in the application folder.")
-        else:
-            templateContent = open(self.template).read()
-        """
-        Look if the code should do anything
-        """
-        if self.CheckVar3.get() == 0:
-            rowCount = 1
-            with open(self.csvFile, 'rb') as csvfile:
-                spamreader = csv.reader(
-                    csvfile, delimiter=self.delimiterString)
-                for row in spamreader:
-                    """
-                    In the first round the loop will gather the location of the keywords in the csvfile.
-                    """
-                    if rowCount == 1:
-                        try:
-                            titelIndex = row.index("Titel")
-                            voornaamIndex = row.index("Voornaam")
-                            initialenIndex = row.index("Initialen")
-                            tussenvoegselIndex = row.index("Tussenvoegsel")
-                            achternaamIndex = row.index("Achternaam")
-                            bedrijfsnaamIndex = row.index("Bedrijfsnaam")
-                            adresIndex = row.index("Adres")
-                            postcodeIndex = row.index("Postcode")
-                            plaatsIndex = row.index("Plaats")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: There is an error in the names for the columns for the userdata.")
-                        try:
-                            betalingstermijnIndex = row.index("Betalingstermijn")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with invoice numbers called: Betalingstermijn.")
-                        try:
-                            ponummerIndex = row.index("PO-nummer")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with invoice numbers called: PO-nummer.")
-                        try:
-                            factuurnummerIndex = row.index("Factuurnummer")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with invoice numbers called: Factuurnummer.")
-                        try:
-                            onderwerpIndex = row.index("Onderwerp")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with the subject called: Onderwerp.")
-                        try:
-                            zaakIndex = row.index("Zaak")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with description for the invoice called: Zaak.")
-                        try:
-                            bedragIndex = row.index("Bedrag")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with the amounts of the bills called: Bedrag.")
-                        try:
-                            postIndex = row.index("Post")
-                        except:
-                            tkMessageBox.showerror("Fatal Error",
-                                "FATAL ERROR: You forgot to add the column with the entries for the bills: Post.")
-                        rowCount += 1
+                    try:
+                        templateContent = open(os.path.dirname(
+                            sys.argv[0]) + "\default_invoice.tex").read()
+                    except:
+                        tkMessageBox.showerror("Fatal Error",
+                            "FATAL ERROR: No default invoice present in the application folder.")
+            else:
+                templateContent = open(self.template).read()
+            """
+            Look if the code should do anything
+            """
+            if self.CheckVar3.get() == 0:
+                rowCount = 1
+                with open(self.csvFile, 'rb') as csvfile:
+                    spamreader = csv.reader(
+                        csvfile, delimiter=self.delimiterString)
+                    for row in spamreader:
                         """
-                        For each row with data this part will get the data from the proper columns and place them in the correct part of the selected template.
+                        In the first round the loop will gather the location of the keywords in the csvfile.
                         """
-                    else:
-                        """
-                        Retrieve the data from the .csv
-                        """
-                        try:
-                            titel = row[titelIndex].strip()
-                            voornaam = row[voornaamIndex].strip()
-                            initialen = row[initialenIndex].strip()
-                            tussenvoegsel = row[tussenvoegselIndex].strip()
-                            achternaam = row[achternaamIndex].strip()
-                            bedrijfsnaam = row[bedrijfsnaamIndex].strip()
-                            adres = row[adresIndex].strip()
-                            postcode = row[postcodeIndex].strip()
-                            plaats = row[plaatsIndex].strip()
-                        except:
-                            logFile.write(
-                                "ERROR: There is something wrong with the userdata on row: " + str(rowCount) + ". \n")
-                        factuurnummer = row[factuurnummerIndex].strip()
-                        onderwerp = row[onderwerpIndex].strip()
-                        zaak = row[zaakIndex].strip()
-                        bedrag = row[bedragIndex].split(self.blockDelimiterString)
-                        post = row[postIndex].split(self.blockDelimiterString)
-                        betalingstermijn = row[betalingstermijnIndex].strip()
-                        ponummer = row[ponummerIndex].strip()
-                        """
-                        Transform the gathered data to something that can be entered in the template
-                        """
-                        userData = {
-                            "titel": titel,
-                            "voornaam": voornaam,
-                            "initialen": initialen,
-                            "tussenvoegsel":tussenvoegsel,
-                            "achternaam": achternaam,
-                            "bedrijfsnaam": bedrijfsnaam,
-                            "adres": adres,
-                            "postcode": postcode,
-                            "plaats": plaats,
-                        }
-                        adresContent = self.getAdresContent(userData)
-                        aanhefContent = self.getAanhefContent(userData)
-                        betalingstermijnContent = self.getBetalingstermijnContent(betalingstermijn)
-                        factuurnummerContent = self.getFactuurnummerContent(factuurnummer, rowCount, logFile)
-                        tabelContent = self.getTabelContent(bedrag, post, onderwerp, rowCount, logFile)
-                        ponummerContent = self.getPonummerContent(ponummer)
-                        """
-                        Replace the content of the data in the invoice template
-                        """
-                        newFileContent = templateContent.replace(
-                            "adres}{adres", "adres}{" + adresContent)
-                        newFileContent = newFileContent.replace(
-                            "betreftregel}{onderwerp", "betreftregel}{" + onderwerp)
-                        newFileContent = newFileContent.replace(
-                            "voornaam}{voornaam", "voornaam}{" + aanhefContent)
-                        newFileContent = newFileContent.replace(
-                            "zaak}{zaak", "zaak}{" + zaak)
-                        newFileContent = newFileContent.replace(
-                            "paymentperiod}{14", "paymentperiod}{" + betalingstermijnContent)
-                        newFileContent = newFileContent.replace(
-                            "factuurnummer}{factuurnummer", "factuurnummer}{" + factuurnummerContent)
-                        newFileContent = newFileContent.replace(
-                            r"\betreftregel & \euro & bedrag \\[6pt]\hline", tabelContent["bedragLine"])
-                        newFileContent = newFileContent.replace(
-                            "totaalbedrag", tabelContent["totaalbedrag"])
-                        newFileContent = newFileContent.replace(
-                            "%\uwkenmerk{}", ponummerContent)
+                        if rowCount == 1:
+                            try:
+                                titelIndex = row.index("Titel")
+                                voornaamIndex = row.index("Voornaam")
+                                initialenIndex = row.index("Initialen")
+                                tussenvoegselIndex = row.index("Tussenvoegsel")
+                                achternaamIndex = row.index("Achternaam")
+                                bedrijfsnaamIndex = row.index("Bedrijfsnaam")
+                                adresIndex = row.index("Adres")
+                                postcodeIndex = row.index("Postcode")
+                                plaatsIndex = row.index("Plaats")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: There is an error in the names for the columns for the userdata.")
+                            try:
+                                betalingstermijnIndex = row.index("Betalingstermijn")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with invoice numbers called: Betalingstermijn.")
+                            try:
+                                ponummerIndex = row.index("PO-nummer")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with invoice numbers called: PO-nummer.")
+                            try:
+                                factuurnummerIndex = row.index("Factuurnummer")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with invoice numbers called: Factuurnummer.")
+                            try:
+                                onderwerpIndex = row.index("Onderwerp")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with the subject called: Onderwerp.")
+                            try:
+                                zaakIndex = row.index("Zaak")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with description for the invoice called: Zaak.")
+                            try:
+                                bedragIndex = row.index("Bedrag")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with the amounts of the bills called: Bedrag.")
+                            try:
+                                postIndex = row.index("Post")
+                            except:
+                                tkMessageBox.showerror("Fatal Error",
+                                    "FATAL ERROR: You forgot to add the column with the entries for the bills: Post.")
+                            rowCount += 1
+                            """
+                            For each row with data this part will get the data from the proper columns and place them in the correct part of the selected template.
+                            """
+                        else:
+                            """
+                            Retrieve the data from the .csv
+                            """
+                            try:
+                                titel = row[titelIndex].strip()
+                                voornaam = row[voornaamIndex].strip()
+                                initialen = row[initialenIndex].strip()
+                                tussenvoegsel = row[tussenvoegselIndex].strip()
+                                achternaam = row[achternaamIndex].strip()
+                                bedrijfsnaam = row[bedrijfsnaamIndex].strip()
+                                adres = row[adresIndex].strip()
+                                postcode = row[postcodeIndex].strip()
+                                plaats = row[plaatsIndex].strip()
+                            except:
+                                logFile.write(
+                                    "ERROR: There is something wrong with the userdata on row: " + str(rowCount) + ". \n")
+                            factuurnummer = row[factuurnummerIndex].strip()
+                            onderwerp = row[onderwerpIndex].strip()
+                            zaak = row[zaakIndex].strip()
+                            bedrag = row[bedragIndex].split(self.blockDelimiterString)
+                            post = row[postIndex].split(self.blockDelimiterString)
+                            betalingstermijn = row[betalingstermijnIndex].strip()
+                            ponummer = row[ponummerIndex].strip()
+                            """
+                            Transform the gathered data to something that can be entered in the template
+                            """
+                            userData = {
+                                "titel": titel,
+                                "voornaam": voornaam,
+                                "initialen": initialen,
+                                "tussenvoegsel":tussenvoegsel,
+                                "achternaam": achternaam,
+                                "bedrijfsnaam": bedrijfsnaam,
+                                "adres": adres,
+                                "postcode": postcode,
+                                "plaats": plaats,
+                            }
+                            adresContent = self.getAdresContent(userData)
+                            aanhefContent = self.getAanhefContent(userData)
+                            betalingstermijnContent = self.getBetalingstermijnContent(betalingstermijn)
+                            factuurnummerContent = self.getFactuurnummerContent(factuurnummer, rowCount, logFile)
+                            tabelContent = self.getTabelContent(bedrag, post, onderwerp, rowCount, logFile)
+                            ponummerContent = self.getPonummerContent(ponummer)
+                            """
+                            Replace the content of the data in the invoice template
+                            """
+                            newFileContent = templateContent.replace(
+                                "adres}{adres", "adres}{" + adresContent)
+                            newFileContent = newFileContent.replace(
+                                "betreftregel}{onderwerp", "betreftregel}{" + onderwerp)
+                            newFileContent = newFileContent.replace(
+                                "voornaam}{voornaam", "voornaam}{" + aanhefContent)
+                            newFileContent = newFileContent.replace(
+                                "zaak}{zaak", "zaak}{" + zaak)
+                            newFileContent = newFileContent.replace(
+                                "paymentperiod}{14", "paymentperiod}{" + betalingstermijnContent)
+                            newFileContent = newFileContent.replace(
+                                "factuurnummer}{factuurnummer", "factuurnummer}{" + factuurnummerContent)
+                            newFileContent = newFileContent.replace(
+                                r"\betreftregel & \euro & bedrag \\[6pt]\hline", tabelContent["bedragLine"])
+                            newFileContent = newFileContent.replace(
+                                "totaalbedrag", tabelContent["totaalbedrag"])
+                            newFileContent = newFileContent.replace(
+                                "%\uwkenmerk{}", ponummerContent)
 
-                        """
-                        Create temporary .tex file to store the edited template.
-                        The temporary file will be made to an .pdf and can be deleted afterwards.
-                        """
-                        newFile = open(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex", "a+")
-                        newFile.write(newFileContent)
-                        newFile.close()
-                        self.create_pdf(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex",
-                                        self.destinationFolder + "/")
-                        if self.CheckVar6.get() == 0:
-                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex")
-                        rowCount += 1
-                        if self.CheckVar7.get() == 1:
-                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".aux")
-                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".log")
-                            os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".out")
-            logFile.close()
-            if self.CheckVar2.get() == 1:
-                os.startfile(self.destinationFolder + "/logFile.txt")
-            if self.CheckVar.get() == 0:
-                os.remove(self.destinationFolder + "/logFile.txt")
-            tkMessageBox.showinfo("AIG", "Invoices have been generated")
+                            """
+                            Create temporary .tex file to store the edited template.
+                            The temporary file will be made to an .pdf and can be deleted afterwards.
+                            """
+                            newFile = open(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex", "a+")
+                            newFile.write(newFileContent)
+                            newFile.close()
+                            self.create_pdf(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex",
+                                            self.destinationFolder + "/")
+                            if self.CheckVar6.get() == 0:
+                                os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex")
+                            rowCount += 1
+                            if self.CheckVar7.get() == 1:
+                                os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".aux")
+                                os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".log")
+                                os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".out")
+        endForLogFile = self.generateEndForLogFile()
+        with open(self.destinationFolder + "/logFile.txt", "a") as logFile:
+            logFile.write(endForLogFile)
+        if self.CheckVar2.get() == 1:
+            os.startfile(self.destinationFolder + "/logFile.txt")
+        if self.CheckVar.get() == 0:
+            os.remove(self.destinationFolder + "/logFile.txt")
+        tkMessageBox.showinfo("AIG", "Invoices have been generated")
 
     def createWidgets(self):
         """
