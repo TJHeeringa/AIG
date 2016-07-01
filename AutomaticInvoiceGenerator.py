@@ -212,6 +212,20 @@ class Application(Frame):
             ponummerContent = "%\uwkenmerk{}"
         return ponummerContent
 
+    def getOnderwerpContent(self, onderwerp, rowCount, logFile):
+        if onderwerp == "":
+            logFile.write(
+                "ERROR:   You omitted the subject on row: " + str(rowCount) + ". \n"
+                "NOTICE:  'Samenwerkingsovereenkomst' has been set as subject on row: " + str(rowCount) + ". \n")
+            onderwerp = "Samenwerkingsovereenkomst"
+        return onderwerp
+
+    def getZaakContent(self, zaak, rowCount, logFile):
+        if zaak == "":
+            logFile.write(
+                "ERROR:   You omitted the reason for the invoice on row: " + str(rowCount) + ". \n")
+        return zaak
+
     def generateEndForLogFile(self):
         with open(self.destinationFolder + "/logFile.txt", "r") as logFile:
             x = logFile.read()
@@ -371,21 +385,23 @@ class Application(Frame):
                             }
                             adresContent = self.getAdresContent(userData)
                             aanhefContent = self.getAanhefContent(userData)
-                            betalingstermijnContent = self.getBetalingstermijnContent(betalingstermijn)
                             factuurnummerContent = self.getFactuurnummerContent(factuurnummer, rowCount, logFile)
                             tabelContent = self.getTabelContent(bedrag, post, onderwerp, rowCount, logFile)
+                            zaakContent = self.getZaakContent(zaak, rowCount, logFile)
+                            onderwerpContent = self.getZaakContent(onderwerp, rowCount, logFile)
                             ponummerContent = self.getPonummerContent(ponummer)
+                            betalingstermijnContent = self.getBetalingstermijnContent(betalingstermijn)
                             """
                             Replace the content of the data in the invoice template
                             """
                             newFileContent = templateContent.replace(
                                 "adres}{adres", "adres}{" + adresContent)
                             newFileContent = newFileContent.replace(
-                                "betreftregel}{onderwerp", "betreftregel}{" + onderwerp)
+                                "betreftregel}{onderwerp", "betreftregel}{" + onderwerpContent)
                             newFileContent = newFileContent.replace(
                                 "voornaam}{voornaam", "voornaam}{" + aanhefContent)
                             newFileContent = newFileContent.replace(
-                                "zaak}{zaak", "zaak}{" + zaak)
+                                "zaak}{zaak", "zaak}{" + zaakContent)
                             newFileContent = newFileContent.replace(
                                 "paymentperiod}{14", "paymentperiod}{" + betalingstermijnContent)
                             newFileContent = newFileContent.replace(
