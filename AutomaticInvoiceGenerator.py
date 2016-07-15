@@ -126,13 +126,13 @@ class Application(Frame):
         return aanhefContent
 
     def getBetalingstermijnContent(self, betalingstermijn):
-        if self.CheckVar5.get() == 1:
-            betalingstermijnContent = self.EntryVar2.get()
+        if betalingstermijn != "":
+            betalingstermijnContent = betalingstermijn
         else:
-            if betalingstermijn != "":
-                betalingstermijnContent = betalingstermijn
-            else:
+            if self.CheckVar5.get() == 1:
                 betalingstermijnContent = self.EntryVar2.get()
+            else:
+                betalingstermijnContent = "30"
         return betalingstermijnContent
 
     def getFactuurnummerContent(self, factuurnummer, rowCount, logFile):
@@ -343,7 +343,7 @@ class Application(Frame):
                                     "FATAL ERROR: You forgot to add the column with the entries for the bills: Post.")
                             rowCount += 1
                             """
-                            For each row with data this part will get the data from the proper columns and place them in the correct part of the selected template.
+                            For each row with data the part below will get the data from the proper columns and place them in the correct part of the selected template.
                             """
                         else:
                             """
@@ -424,11 +424,11 @@ class Application(Frame):
                                             self.destinationFolder + "/")
                             if self.CheckVar6.get() == 0:
                                 os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".tex")
-                            rowCount += 1
                             if self.CheckVar7.get() == 1:
                                 os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".aux")
                                 os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".log")
                                 os.remove(self.destinationFolder + "/" + "F." + factuurnummerContent + " " + onderwerp + ".out")
+                            rowCount += 1
         endForLogFile = self.generateEndForLogFile()
         with open(self.destinationFolder + "/logFile.txt", "a") as logFile:
             logFile.write(endForLogFile)
@@ -558,7 +558,7 @@ class Application(Frame):
         '''
         self.EntryText2.set("Default Invoice Used")
         self.EntryVar.set("16")
-        self.EntryVar2.set("14")
+        self.EntryVar2.set("30")
         self.CheckVar.set(1)
         self.CheckVar2.set(1)
         self.CheckVar3.set(0)
@@ -572,6 +572,7 @@ class Application(Frame):
 
 root = Tk()
 root.title("Automatic Invoice Generator")
+root.iconbitmap(default="logo48x48.ico")
 root.geometry("925x370")
 app = Application(master=root)
 app.mainloop()
